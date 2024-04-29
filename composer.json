@@ -16,7 +16,7 @@
         "symfony/security-bundle": "7.0.*",
         "symfony/security-core": "7.0.*",
         "symfony/security-http": "7.0.*",
-        "symfony/yaml": "^5.4"
+        "symfony/yaml": "7.0.*"
     },
     "require-dev": {
         "colinodell/psr-testlogger": "^1.2",
