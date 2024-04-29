@@ -15,7 +15,7 @@
         "symfony/psr-http-message-bridge": "^2.0",
         "symfony/security-bundle": "7.0.*",
         "symfony/security-core": "7.0.*",
-        "symfony/security-http": "7.0.*,
+        "symfony/security-http": "7.0.*",
         "symfony/yaml": "^5.4"
     },
     "require-dev": {
