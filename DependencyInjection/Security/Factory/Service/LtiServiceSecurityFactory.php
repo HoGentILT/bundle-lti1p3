@@ -22,21 +22,28 @@ declare(strict_types=1);
 
 namespace OAT\Bundle\Lti1p3Bundle\DependencyInjection\Security\Factory\Service;
 
+use OAT\Bundle\Lti1p3Bundle\Security\Authentication\Provider\Message\LtiPlatformMessageAuthenticationProvider;
 use OAT\Bundle\Lti1p3Bundle\Security\Authentication\Provider\Service\LtiServiceAuthenticationProvider;
 use OAT\Bundle\Lti1p3Bundle\Security\Firewall\Service\LtiServiceAuthenticationListener;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Platform\PlatformLaunchValidatorInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidatorInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class LtiServiceSecurityFactory implements SecurityFactoryInterface
+class LtiServiceSecurityFactory implements AuthenticatorFactoryInterface
 {
     public function getPosition(): string
     {
         return 'pre_auth';
+    }
+
+    public function getPriority(): int
+    {
+        return 0;
     }
 
     public function getKey(): string
@@ -68,6 +75,27 @@ class LtiServiceSecurityFactory implements SecurityFactoryInterface
         $container->setDefinition($listenerId, new ChildDefinition(LtiServiceAuthenticationListener::class));
 
         return [$providerId, $listenerId, $defaultEntryPoint];
+    }
+
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
+    {
+        $providerId = sprintf('security.authenticator.%s.%s', $this->getKey(), $firewallName);
+        $providerDefinition = new Definition(LtiServiceAuthenticationProvider::class);
+        $providerDefinition
+            ->setShared(false)
+            ->setArguments(
+                [
+                    new Reference(RequestAccessTokenValidatorInterface::class),
+                    $firewallName,
+                    $config['types'] ?? []
+                ]
+            );
+        $container->setDefinition($providerId, $providerDefinition);
+
+        //$listenerId = sprintf('security.authentication.listener.%s.%s', $this->getKey(), $id);
+        //$container->setDefinition($listenerId, new ChildDefinition(LtiPlatformMessageAuthenticationListener::class));
+
+        return $providerId;
     }
 
     public function addConfiguration(NodeDefinition $node): void

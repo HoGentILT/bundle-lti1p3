@@ -27,6 +27,7 @@ use OAT\Bundle\Lti1p3Bundle\DependencyInjection\Compiler\ConfigurationPass;
 use OAT\Bundle\Lti1p3Bundle\DependencyInjection\Security\Factory\Message\LtiPlatformMessageSecurityFactory;
 use OAT\Bundle\Lti1p3Bundle\DependencyInjection\Security\Factory\Message\LtiToolMessageSecurityFactory;
 use OAT\Bundle\Lti1p3Bundle\DependencyInjection\Security\Factory\Service\LtiServiceSecurityFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -47,15 +48,18 @@ class Lti1p3Bundle extends Bundle
         $this->configureSecurityExtension($container->getExtension('security'));
     }
 
+    /**
+     * @param ExtensionInterface|SecurityExtension $securityExtension
+     * @return void
+     */
     private function configureSecurityExtension(ExtensionInterface $securityExtension): void
     {
-        // LTI platform messages security registration
-        $securityExtension->addSecurityListenerFactory(new LtiPlatformMessageSecurityFactory());
+        $securityExtension->addAuthenticatorFactory(new LtiPlatformMessageSecurityFactory());
 
         // LTI tool messages security registration
-        $securityExtension->addSecurityListenerFactory(new LtiToolMessageSecurityFactory());
+        $securityExtension->addAuthenticatorFactory(new LtiToolMessageSecurityFactory());
 
         // LTI services security registration
-        $securityExtension->addSecurityListenerFactory(new LtiServiceSecurityFactory());
+        $securityExtension->addAuthenticatorFactory(new LtiServiceSecurityFactory());
     }
 }
