@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Bundle\Lti1p3Bundle\Security\Authentication\Token\Message;
 
+use OAT\Bundle\Lti1p3Bundle\Security\User\LtiUser;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 
@@ -45,17 +46,16 @@ class LtiToolMessageSecurityToken extends AbstractLtiMessageSecurityToken
                 $userIdentity = $payload->getUserIdentity();
 
                 if (null !== $userIdentity) {
-                    $this->setUser($userIdentity->getIdentifier());
+                    $ltiUser = new LtiUser();
+                    $ltiUser->setIdentifier($userIdentity->getIdentifier());
+                    $this->setUser($ltiUser);
                 }
 
                 $this->roleNames = $payload->getRoles();
+                array_merge($this->roleNames, $ltiUser->getRoles());
             }
-
-            $this->setAuthenticated(!$this->validationResult->hasError());
         } else {
             $this->roleNames = [];
-
-            $this->setAuthenticated(false);
         }
     }
 }

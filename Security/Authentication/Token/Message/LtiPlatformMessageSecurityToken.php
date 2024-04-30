@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OAT\Bundle\Lti1p3Bundle\Security\Authentication\Token\Message;
 
+use OAT\Bundle\Lti1p3Bundle\Security\User\LtiUser;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 
 class LtiPlatformMessageSecurityToken extends AbstractLtiMessageSecurityToken
@@ -33,9 +34,10 @@ class LtiPlatformMessageSecurityToken extends AbstractLtiMessageSecurityToken
         $this->roleNames = [];
 
         if (null !== $this->validationResult) {
-            $this->setAuthenticated(!$this->validationResult->hasError());
+            $ltiUser = new LtiUser();
+            $this->setUser($ltiUser);
+            $this->roleNames = $ltiUser->getRoles();
         } else {
-            $this->setAuthenticated(false);
         }
     }
 }
