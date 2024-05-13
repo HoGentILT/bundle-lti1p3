@@ -98,7 +98,7 @@ class LtiServiceSecurityToken extends AbstractToken
             }
 
             $this->roleNames = $this->validationResult->getScopes();
-            array_merge($this->roleNames, $ltiUser->getRoles());
+            
         } else {
             $this->roleNames = [];
         }
