@@ -52,7 +52,6 @@ class LtiToolMessageSecurityToken extends AbstractLtiMessageSecurityToken
                 }
 
                 $this->roleNames = $payload->getRoles();
-                array_merge($this->roleNames, $ltiUser->getRoles());
             }
         } else {
             $this->roleNames = [];
